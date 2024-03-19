@@ -4,6 +4,8 @@
 #include <sstream>
 #include <string>
 #include <cstring>
+#include <vector>
+#include "geometry.h"
 
 using namespace std;
 
@@ -39,27 +41,84 @@ int main(int argc, char** argv) {
 
 	//opening obj & manipulating 
 	
-	ifstream file; string line;
+	ifstream file; string line_s;
         file.open("african_head.obj");
 	char a;
 	float x, y, z;
+	int d, e, f;
 
+	vector<vec3> vertex;
+
+	vector<vector<int>> f_vertex;
+	
 	if (file.is_open()){
 		cout << "opened file\n";
 		while(!file.eof()){
-			getline(file, line);
-			std::istringstream iss(line.c_str()); 
+			getline(file, line_s);
+			std::istringstream iss(line_s.c_str()); 
 			//cout << "test\n";
 			//cout << a;
-			if (line.compare(0, 2, "v ") == 0){
+			if (line_s.compare(0, 2, "v ") == 0){
 				iss >> a;
 				iss >> x >> y >> z;
-				cout << y << "\n";  
-				image.set(x*64+64, y*64+64, red);		
+			//	cout << y << "\n"; 
+			        vec3 vert;
+				vert[0] = x;
+				vert[1] = y;
+				vert[2] = z;	
+				image.set(x*64+48, y*64+32, red);		
+				vertex.push_back(vert);
 			}
+		
+			if (line_s.compare(0, 2, "f ") == 0){
+				vector<int> face;
+				iss >> a;
+				while(iss >> d >> a >> e >> a >> f){
+					face.push_back(d);
+				//	cout << f_vertex.size() << "\n";
+				}
+				cout << "hi" << "\n";
+			f_vertex.push_back(face);
+		//		iss >> a; //int d, e, f;
+				//push back more
+		//		iss >> d  >> a >> e >> a >> f;
+		//		cout << d <<  " " << e <<  " " << f << "\n";
+
+			
+			}
+		cout << "hi2" << "\n";
+
 		}
+		cout << "hi3" << "\n";
+
 		file.close();
 	}else cout << "couldn't open file\n";
+		cout << "hi4" << "\n";
+
+	for(int i = 0; i<(int)f_vertex.size()-1; i++){
+				cout << "hi6" << "\n";
+
+		int prev_ind = i-1;
+		vector<int> current_triangle = f_vertex[i];
+				cout << "hi7" << "\n";
+
+		for(int j = 0; j<3; j++){
+					cout << "hi5" << "\n";
+
+			vec3 v0 = vertex[current_triangle[j]];
+			vec3 v1 = vertex[current_triangle[(j+1)%3]];
+			int x0 = (v0.x) * 64 + 32;
+			int y0 = (v0.y) * 64 + 32;
+			int x1 = (v1.x) * 64 + 32;
+			int y1 = (v1.y) * 64 + 32;
+			cout << current_triangle[0] << " " <<  current_triangle[1] << " " << current_triangle[2] << " " << y1 << "\n";
+			cout << v0.x << " " << v0.y << "\n";
+
+			cout << "i: " << i << "\n";
+
+			line(x0, x1, y0, y1, image, white);
+		}
+	}
 
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
 	image.write_tga_file("output.tga");
