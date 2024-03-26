@@ -35,7 +35,7 @@ void line (int x0, int x1, int y0, int y1, TGAImage &img, TGAColor col){
 }
 
 int main(int argc, char** argv) {
-	TGAImage image(100, 100, TGAImage::RGB);
+	TGAImage image(800, 800, TGAImage::RGB);
 	image.set(52, 41, red);
 	line(10, 11, 5, 10, image, white);
 
@@ -77,7 +77,6 @@ int main(int argc, char** argv) {
 					face.push_back(d);
 				//	cout << f_vertex.size() << "\n";
 				}
-				cout << "hi" << "\n";
 			f_vertex.push_back(face);
 		//		iss >> a; //int d, e, f;
 				//push back more
@@ -86,38 +85,34 @@ int main(int argc, char** argv) {
 
 			
 			}
-		cout << "hi2" << "\n";
 
 		}
-		cout << "hi3" << "\n";
 
 		file.close();
 	}else cout << "couldn't open file\n";
 		cout << "hi4" << "\n";
 
-	for(int i = 0; i<(int)f_vertex.size()-1; i++){
-				cout << "hi6" << "\n";
-
-		int prev_ind = i-1;
+	for(int i = 0; i<(int)f_vertex.size(); i++){
+			
 		vector<int> current_triangle = f_vertex[i];
-				cout << "hi7" << "\n";
-
-		for(int j = 0; j<3; j++){
-					cout << "hi5" << "\n";
-
-			vec3 v0 = vertex[current_triangle[j]];
-			vec3 v1 = vertex[current_triangle[(j+1)%3]];
-			int x0 = (v0.x) * 64 + 32;
-			int y0 = (v0.y) * 64 + 32;
-			int x1 = (v1.x) * 64 + 32;
-			int y1 = (v1.y) * 64 + 32;
+			vec3 v0 = vertex[current_triangle[0]-1];
+			vec3 v1 = vertex[current_triangle[1]-1];
+			vec3 v2 = vertex[current_triangle[2]-1];
+			int x0 = (v0.x+1) * 400;
+			int y0 = (v0.y+1) * 400;
+			int x1 = (v1.x+1) * 400;
+			int y1 = (v1.y+1) * 400;
+			int x2 = (v2.x+1) * 400;
+			int y2 = (v2.y+1) * 400;
 			cout << current_triangle[0] << " " <<  current_triangle[1] << " " << current_triangle[2] << " " << y1 << "\n";
 			cout << v0.x << " " << v0.y << "\n";
 
 			cout << "i: " << i << "\n";
 
 			line(x0, x1, y0, y1, image, white);
-		}
+			line(x1, x2, y1, y2, image, white);
+			line(x2, x0, y2, y0, image, white);
+		
 	}
 
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
