@@ -34,6 +34,54 @@ void line (int x0, int x1, int y0, int y1, TGAImage &img, TGAColor col){
 	std::cout << "drew line\n";
 }
 
+void triangle(vec3 v0, vec3 v1, vec3 v2, TGAImage &img, TGAColor col){
+
+	if (v0.y > v1.y) std::swap(v0, v1);
+	if (v0.y > v2.y) std::swap(v0, v2);
+	if (v1.y > v2.y) std::swap(v1, v2);
+
+	int x0 = (v0.x+1) * 400;
+	int y0 = (v0.y+1) * 400;
+	int x1 = (v1.x+1) * 400;
+	int y1 = (v1.y+1) * 400;
+	int x2 = (v2.x+1) * 400;
+	int y2 = (v2.y+1) * 400;
+
+	int height = y2 - y0;
+
+	for(int i = y0; i<=y1; i++){
+		int s_height = y1-y0+1;
+		float a = (float)(i-y0)/height;
+		float b = (float)(i-y0)/s_height;
+		int A = x0 + (x2-x0)*a;
+		int B = x0 + (x1-x0)*b;
+		//std::cout << "1\n";
+		if (A > B) std::swap(A, B);
+		for (int k = A; k<=B; k++){
+			std::cout << a << " " << b << "\n";
+			img.set(k, i, col);
+		}
+	}
+
+	for(int i = y1; i<=y2; i++){
+		int s_height = y2-y1+1;
+		float a = (float)(i-y0)/height;
+		float b = (float)(i-y1)/s_height;
+		int A = x0 + (x2-x0)*a;
+		int B = x1 + (x2-x1)*b;
+		//std::cout << "1\n";
+		if (A > B) std::swap(A, B);
+		for (int k = A; k<=B; k++){
+			//std::cout << B << " " << k << "\n";
+			img.set(k, i, col);
+		}
+	}
+	
+	//line(x0, x1, y0, y1, img, white);
+	//line(x1, x2, y1, y2, img, white);
+	//line(x2, x0, y2, y0, img, white);
+}
+
 int main(int argc, char** argv) {
 	TGAImage image(800, 800, TGAImage::RGB);
 	image.set(52, 41, red);
@@ -98,20 +146,7 @@ int main(int argc, char** argv) {
 			vec3 v0 = vertex[current_triangle[0]-1];
 			vec3 v1 = vertex[current_triangle[1]-1];
 			vec3 v2 = vertex[current_triangle[2]-1];
-			int x0 = (v0.x+1) * 400;
-			int y0 = (v0.y+1) * 400;
-			int x1 = (v1.x+1) * 400;
-			int y1 = (v1.y+1) * 400;
-			int x2 = (v2.x+1) * 400;
-			int y2 = (v2.y+1) * 400;
-			cout << current_triangle[0] << " " <<  current_triangle[1] << " " << current_triangle[2] << " " << y1 << "\n";
-			cout << v0.x << " " << v0.y << "\n";
-
-			cout << "i: " << i << "\n";
-
-			line(x0, x1, y0, y1, image, white);
-			line(x1, x2, y1, y2, image, white);
-			line(x2, x0, y2, y0, image, white);
+			triangle(v0, v1, v2, image, TGAColor(rand()%255, rand()%255, rand()%255, 255));
 		
 	}
 
