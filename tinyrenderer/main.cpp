@@ -47,6 +47,11 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, TGAImage &img, TGAColor col, float *buf
 	int x2 = (v2.x+1) * 400;
 	int y2 = (v2.y+1) * 400;
 
+	int z0 = (v0.z+1) * 400;
+	int z1 = (v1.z+1) * 400;
+	int z2 = (v2.z+1) * 400;
+
+
 	int height = y2 - y0;
 
 	float z = 0;
@@ -59,7 +64,7 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, TGAImage &img, TGAColor col, float *buf
 		int B = x0 + (x1-x0)*b;
 		//std::cout << "1\n";
 		if (A > B) std::swap(A, B);
-		z = y0 + y1 + y2;
+		z = z0 + z1 + z2;
 		for (int k = A; k<=B; k++){
 			if(z > buffer[k+i*800]){
 				std::cout << a << " " << b << "\n";
@@ -77,7 +82,7 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, TGAImage &img, TGAColor col, float *buf
 		int B = x1 + (x2-x1)*b;
 		//std::cout << "1\n";
 		if (A > B) std::swap(A, B);
-		z = y0 + y1 + y2;
+		z = z0 + z1 + z2;
 		for (int k = A; k<=B; k++){
 			if(z > buffer[k+i*800]){
 				//std::cout << B << " " << k << "\n";
