@@ -34,7 +34,7 @@ void line (int x0, int x1, int y0, int y1, TGAImage &img, TGAColor col){
 	std::cout << "drew line\n";
 }
 
-void triangle(vec3 v0, vec3 v1, vec3 v2, TGAImage &img, TGAColor col){
+void triangle(vec3 v0, vec3 v1, vec3 v2, TGAImage &img, TGAColor col, float *buffer){
 
 	if (v0.y > v1.y) std::swap(v0, v1);
 	if (v0.y > v2.y) std::swap(v0, v2);
@@ -49,6 +49,8 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, TGAImage &img, TGAColor col){
 
 	int height = y2 - y0;
 
+	float z = 0;
+
 	for(int i = y0; i<=y1; i++){
 		int s_height = y1-y0+1;
 		float a = (float)(i-y0)/height;
@@ -57,9 +59,13 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, TGAImage &img, TGAColor col){
 		int B = x0 + (x1-x0)*b;
 		//std::cout << "1\n";
 		if (A > B) std::swap(A, B);
+		z = y0 + y1 + y2;
 		for (int k = A; k<=B; k++){
-			std::cout << a << " " << b << "\n";
-			img.set(k, i, col);
+			if(z > buffer[k+i*800]){
+				std::cout << a << " " << b << "\n";
+				buffer[k+i*800] = z;
+				img.set(k, i, col);
+			}
 		}
 	}
 
@@ -71,9 +77,13 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, TGAImage &img, TGAColor col){
 		int B = x1 + (x2-x1)*b;
 		//std::cout << "1\n";
 		if (A > B) std::swap(A, B);
+		z = y0 + y1 + y2;
 		for (int k = A; k<=B; k++){
-			//std::cout << B << " " << k << "\n";
-			img.set(k, i, col);
+			if(z > buffer[k+i*800]){
+				//std::cout << B << " " << k << "\n";
+				buffer[k+i*800] = z;
+				img.set(k, i, col);
+			}
 		}
 	}
 	
@@ -86,7 +96,7 @@ int main(int argc, char** argv) {
 	TGAImage image(800, 800, TGAImage::RGB);
 	image.set(52, 41, red);
 	line(10, 11, 5, 10, image, white);
-
+	float *buffer = new float[800*800];
 	//opening obj & manipulating 
 	
 	ifstream file; string line_s;
@@ -146,8 +156,10 @@ int main(int argc, char** argv) {
 			vec3 v0 = vertex[current_triangle[0]-1];
 			vec3 v1 = vertex[current_triangle[1]-1];
 			vec3 v2 = vertex[current_triangle[2]-1];
-			triangle(v0, v1, v2, image, TGAColor(rand()%255, rand()%255, rand()%255, 255));
+			triangle(v0, v1, v2, image, TGAColor(rand()%255, rand()%255, rand()%255, 255), buffer);
+		//	triangle(v0, v1, v2, image, white, buffer);
 		
+
 	}
 
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
