@@ -106,6 +106,7 @@ int main(int argc, char** argv) {
 	int d, e, f;
 
 	vector<vec3> vertex;
+	vector<vec3> t_vertex;
 
 	vector<vector<int>> f_vertex;
 	
@@ -126,6 +127,15 @@ int main(int argc, char** argv) {
 				vert[2] = z;	
 				image.set(x*64+48, y*64+32, red);		
 				vertex.push_back(vert);
+			}
+			if (line_s.compare(0, 3, "vt ") == 0){
+				iss >> a;
+				iss >> x >> y >> z;
+				vec3 vert;
+				vert[0] = x;
+				vert[1] = y;
+				vert[2] = z;
+				t_vertex.push_back(vert);
 			}
 		
 			if (line_s.compare(0, 2, "f ") == 0){
