@@ -67,7 +67,7 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, TGAImage &img, TGAColor col, float *buf
 		z = z0 + z1 + z2;
 		for (int k = A; k<=B; k++){
 			if(z > buffer[k+i*800]){
-				std::cout << a << " " << b << "\n";
+			//	std::cout << a << " " << b << "\n";
 				buffer[k+i*800] = z;
 				img.set(k, i, col);
 			}
@@ -114,6 +114,9 @@ int main(int argc, char** argv) {
 	vector<vec3> t_vertex;
 
 	vector<vector<int>> f_vertex;
+
+	vec3 light_dir;
+	light_dir.x = 0; light_dir.y = 0; light_dir.z = -1;
 	
 	if (file.is_open()){
 		cout << "opened file\n";
@@ -163,16 +166,28 @@ int main(int argc, char** argv) {
 
 		file.close();
 	}else cout << "couldn't open file\n";
-		cout << "hi4" << "\n";
 
 	for(int i = 0; i<(int)f_vertex.size(); i++){
-			
+		vec3 w_coord[3];
+		vec3 s_coord[3];
 		vector<int> current_triangle = f_vertex[i];
 			vec3 v0 = vertex[current_triangle[0]-1];
 			vec3 v1 = vertex[current_triangle[1]-1];
 			vec3 v2 = vertex[current_triangle[2]-1];
-			triangle(v0, v1, v2, image, TGAColor(rand()%255, rand()%255, rand()%255, 255), buffer);
-		//	triangle(v0, v1, v2, image, white, buffer);
+			w_coord[0] = v0;
+			w_coord[1] = v1;
+			w_coord[2] = v2;
+	
+
+	
+
+		vec3 l = cross((w_coord[2]-w_coord[0]), (w_coord[1]-w_coord[0])); 
+		//l.normalized();
+		float in = l*light_dir;
+		cout << in << "\n";	
+		//triangle(v0, v1, v2, image, TGAColor(rand()%255, rand()%255, rand()%255, 255), buffer);
+			triangle(v0, v1, v2, image, TGAColor(in*100*255, in*100*255, in*100*255, 255), buffer);
+			//	triangle(v0, v1, v2, image, white, buffer);
 		
 
 	}
