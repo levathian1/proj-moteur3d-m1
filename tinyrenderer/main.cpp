@@ -13,7 +13,7 @@ using namespace std;
 const TGAColor white = TGAColor(255, 255, 255, 255);
 const TGAColor red   = TGAColor(255, 0,   0,   255);
 
-void texturing(vec3 v0, TGAImage &img, TGAImage &tex){
+void texturing(vec3 v0, vec3 pos, TGAImage &img, TGAImage &tex, TGAColor col){
 
 	// int x0 = (v0.x+1) * 512;
 	// int y0 = (v0.y+1) * 512;
@@ -21,15 +21,14 @@ void texturing(vec3 v0, TGAImage &img, TGAImage &tex){
 	// multiply by the width-height of the texture image and you will get the color to put in your render.
 	// 1024 * 1024
 
-	TGAColor loc = tex.get(v0.x+100, v0.y+100);
-
-	// cout << loc.val <<"\n";
+	TGAColor loc = tex.get(v0.x, v0.y);
+	cout << loc.val%255 <<"\n";
 
 	// std::cout << loc.r <<"\n";
 	// std::cout << loc.g <<"\n";
 	// std::cout << loc.b <<"\n";
 
-	img.set(v0.x, v0.y, loc);
+	img.set(pos.x, pos.y, loc);
 
 }
 
@@ -54,7 +53,7 @@ void line (int x0, int x1, int y0, int y1, TGAImage &img, TGAColor col){
 	// std::cout << "drew line\n";
 }
 
-void triangle(vec3 v0, vec3 v1, vec3 v2, TGAImage &img, TGAImage &tex, TGAColor col, float *buffer){
+void triangle(vec3 v0, vec3 v1, vec3 v2, vec3 v0_t, vec3 v1_t, vec3 v2_t, TGAImage &img, TGAImage &tex, TGAColor col, float *buffer){
 
 	if (v0.y > v1.y) std::swap(v0, v1);
 	if (v0.y > v2.y) std::swap(v0, v2);
@@ -67,58 +66,92 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, TGAImage &img, TGAImage &tex, TGAColor 
 	int x2 = (v2.x+1) * 400;
 	int y2 = (v2.y+1) * 400;
 
+	int x0_t = (v0_t.x+1) * 512;
+	int y0_t = (v0_t.y+1) * 512;
+	int x1_t = (v1_t.x+1) * 512;
+	int y1_t = (v1_t.y+1) * 512;
+	int x2_t = (v2_t.x+1) * 512;
+	int y2_t = (v2_t.y+1) * 512;
+
+
 	int z0 = (v0.z+1) * 400;
 	int z1 = (v1.z+1) * 400;
 	int z2 = (v2.z+1) * 400;
 
 
 	int height = y2 - y0;
+	int height_t = y2_t - y0_t;
+
+	// cout << x2_t << " " << y2_t << " " << z2 << "\n";
 
 	float z = 0;
 
+	int i2 = y0_t;
+
 	for(int i = y0; i<=y1; i++){
+		i2 = i2 + 1;
 		int s_height = y1-y0+1;
 		float a = (float)(i-y0)/height;
+		float a_t = (float)(i2-y0_t)/height_t;
 		float b = (float)(i-y0)/s_height;
 		int A = x0 + (x2-x0)*a;
 		int B = x0 + (x1-x0)*b;
+		int A_t = x0_t + (x2_t-x0_t)*a_t;
+		// int B_t = x0_t + (x1_t-x0_t)*b;
 		//std::cout << "1\n";
 		if (A > B) std::swap(A, B);
 		z = z0 + z1 + z2;
+		int k2 = A_t;
 		for (int k = A; k<=B; k++){
+			k2 = k2 + 1;
 			if(z > buffer[k+i*800]){
+				// cout << "hi" << "\n";
+				// cout << k2 <<"\n";
 			//	std::cout << a << " " << b << "\n";
 				buffer[k+i*800] = z;
-				vec3 vector;
-				vector.x = k;
-				vector.y = i;
-				texturing(vector, img, tex);
+				vec3 vector, pos;
+				vector.x = k2;
+				vector.y = i2;
+				pos.x = k;
+				pos.y = i;
+				texturing(vector, pos, img, tex, col);
 				// img.set(k, i, col);
 			}
 		}
 	}
 
+	i2 = y1_t;
+
 	for(int i = y1; i<=y2; i++){
+		i2 = i2 + 1;
 		int s_height = y2-y1+1;
 		float a = (float)(i-y0)/height;
+		float a_t = (float)(i2-y0_t)/height_t;
 		float b = (float)(i-y1)/s_height;
 		int A = x0 + (x2-x0)*a;
 		int B = x1 + (x2-x1)*b;
+		int A_t = x0_t + (x2_t-x0_t)*a_t;
 		//std::cout << "1\n";
 		if (A > B) std::swap(A, B);
 		z = z0 + z1 + z2;
+		int k2 = A_t;
 		for (int k = A; k<=B; k++){
+			k2 = k2 + 1;
 			if(z > buffer[k+i*800]){
 				//std::cout << B << " " << k << "\n";
 				buffer[k+i*800] = z;
-				vec3 vector;
-				vector.x = k;
-				vector.y = i;
-				texturing(vector, img, tex);
+				vec3 vector, pos;
+				vector.x = k2;
+				vector.y = i2;
+				pos.x = k;
+				pos.y = i;
+				texturing(vector, pos, img, tex, col);
 				// img.set(k, i, col);
 			}
 		}
 	}
+
+	// cout << "hi2" << "\n";
 	
 	//line(x0, x1, y0, y1, img, white);
 	//line(x1, x2, y1, y2, img, white);
@@ -129,8 +162,8 @@ int main(int argc, char** argv) {
 	TGAImage image(800, 800, TGAImage::RGB);
 	TGAImage tex;
 	bool read = tex.read_tga_file("african_head_diffuse.tga");
-	tex.flip_horizontally();
-	tex.flip_vertically();
+	// tex.flip_horizontally();
+	// tex.flip_vertically();
 	if (!read){
 		cout << "problem";
 		return -1;
@@ -146,6 +179,7 @@ int main(int argc, char** argv) {
 	ifstream file; string line_s;
         file.open("african_head.obj");
 	char a;
+	char b[2];
 	float x, y, z;
 	int d, e, f;
 
@@ -178,8 +212,9 @@ int main(int argc, char** argv) {
 				vertex.push_back(vert);
 			}
 			if (line_s.compare(0, 3, "vt ") == 0){
-				iss >> a;
+				iss >> b;
 				iss >> x >> y >> z;
+				// cout << b << " " << x << y << z << "\n";
 				vec3 vert;
 				vert[0] = x;
 				vert[1] = y;
@@ -194,14 +229,15 @@ int main(int argc, char** argv) {
 				while(iss >> d >> a >> e >> a >> f){
 					face.push_back(d);
                     vert.push_back(e);
-				//	cout << f_vertex.size() << "\n";
+					// cout << e << "\n";
 				}
 			f_vertex.push_back(face);
-            tex_vertex.push_back(vert);
-		//		iss >> a; //int d, e, f;
+            tex_vertex.push_back(vert); // TODO: use this please :)
+				// iss >> a; //int d, e, f;
 				//push back more
 		//		iss >> d  >> a >> e >> a >> f;
-		//		cout << d <<  " " << e <<  " " << f << "\n";
+				// cout << d <<  " " << e <<  " " << f << "\n";
+				// cout << e <<  "\n";
 
 			
 			}
@@ -215,12 +251,18 @@ int main(int argc, char** argv) {
 		vec3 w_coord[3];
 		vec3 s_coord[3];
 		vector<int> current_triangle = f_vertex[i];
+		vector<int> current_tex_triangle = tex_vertex[i];
 			vec3 v0 = vertex[current_triangle[0]-1];
 			vec3 v1 = vertex[current_triangle[1]-1];
 			vec3 v2 = vertex[current_triangle[2]-1];
-			w_coord[0] = v0;
-			w_coord[1] = v1;
-			w_coord[2] = v2;
+			// Texturing pass should be done afterwards, not one to one on tex coords 
+		vec3 v0_t = t_vertex[current_tex_triangle[0]-1];
+		vec3 v1_t = t_vertex[current_tex_triangle[1]-1];
+		vec3 v2_t = t_vertex[current_tex_triangle[2]-1];	
+
+			w_coord[0] = v0_t;
+			w_coord[1] = v1_t;
+			w_coord[2] = v2_t;
 	
 
 	
@@ -228,14 +270,17 @@ int main(int argc, char** argv) {
 		vec3 l = cross((w_coord[2]-w_coord[1]), (w_coord[1]-w_coord[0])); 
 		l.normalized();
 		float in = l*light_dir;
-		// cout << in << "\n";	
+		// cout << v0_t << " " << v1_t << "\n";	
 		//triangle(v0, v1, v2, image, TGAColor(rand()%255, rand()%255, rand()%255, 255), buffer);
-		if(in > 0.){
-		// triangle(v0, v1, v2, image, TGAColor((in*50*255), (50*in*255), (50*in*255), 255), buffer);
-		triangle(v0, v1, v2, image, tex, TGAColor((in*50*255), (50*in*255), (50*in*255), 255), buffer);
-		//	triangle(v0, v1, v2, image, white, buffer);
-		}
+		// if(in > 0.){
+		// // triangle(v0, v1, v2, image, TGAColor((in*50*255), (50*in*255), (50*in*255), 255), buffer);
+		// 	// triangle(v0, v1, v2, v0_t, v1_t, v2_t, image, tex, TGAColor((in*50*255), (50*in*255), (50*in*255), 255), buffer);
+		// //	triangle(v0, v1, v2, image, white, buffer);
+		// }
 			
+		line((v0_t.x+1)*400, (v1_t.x+1)*400, (v0_t.y+1)*400, (v1_t.y+1)*400, image, white);
+		line((v1_t.x+1)*400, (v2_t.x+1)*400, (v1_t.y+1)*400, (v2_t.y+1)*400, image, white);
+		line((v2_t.x+1)*400, (v0_t.x+1)*400, (v2_t.y+1)*400, (v0_t.y+1)*400, image, white);
 		
 
 	}
