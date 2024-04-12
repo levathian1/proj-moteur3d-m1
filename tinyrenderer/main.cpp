@@ -22,7 +22,7 @@ void texturing(vec3 v0, vec3 pos, TGAImage &img, TGAImage &tex, TGAColor col){
 	// 1024 * 1024
 
 	TGAColor loc = tex.get(v0.x, v0.y);
-	cout << loc.val%255 <<"\n";
+	// cout << loc.val%255 <<"\n";
 
 	// std::cout << loc.r <<"\n";
 	// std::cout << loc.g <<"\n";
@@ -59,6 +59,10 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, vec3 v0_t, vec3 v1_t, vec3 v2_t, TGAIma
 	if (v0.y > v2.y) std::swap(v0, v2);
 	if (v1.y > v2.y) std::swap(v1, v2);
 
+	if (v0_t.y > v1_t.y) std::swap(v0_t, v1_t);
+	if (v0_t.y > v2_t.y) std::swap(v0_t, v2_t);
+	if (v1_t.y > v2_t.y) std::swap(v1_t, v2_t);
+
 	int x0 = (v0.x+1) * 400;
 	int y0 = (v0.y+1) * 400;
 	int x1 = (v1.x+1) * 400;
@@ -82,26 +86,29 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, vec3 v0_t, vec3 v1_t, vec3 v2_t, TGAIma
 	int height = y2 - y0;
 	int height_t = y2_t - y0_t;
 
-	// cout << x2_t << " " << y2_t << " " << z2 << "\n";
 
 	float z = 0;
 
-	int i2 = y0_t;
+	int i2 = y0_t-1;
 
 	for(int i = y0; i<=y1; i++){
 		i2 = i2 + 1;
 		int s_height = y1-y0+1;
+		int s_height_t = y1_t-y0_t+1;
 		float a = (float)(i-y0)/height;
 		float a_t = (float)(i2-y0_t)/height_t;
 		float b = (float)(i-y0)/s_height;
+		float b_t = (float)(i2-y0_t)/s_height_t;
 		int A = x0 + (x2-x0)*a;
 		int B = x0 + (x1-x0)*b;
 		int A_t = x0_t + (x2_t-x0_t)*a_t;
+		int B_t = x0_t + (x1_t-x0_t)*b_t;
 		// int B_t = x0_t + (x1_t-x0_t)*b;
 		//std::cout << "1\n";
 		if (A > B) std::swap(A, B);
+		if (A_t > B_t) std::swap(A_t, B_t);
 		z = z0 + z1 + z2;
-		int k2 = A_t;
+		int k2 = A_t-1;
 		for (int k = A; k<=B; k++){
 			k2 = k2 + 1;
 			if(z > buffer[k+i*800]){
@@ -114,27 +121,32 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, vec3 v0_t, vec3 v1_t, vec3 v2_t, TGAIma
 				vector.y = i2;
 				pos.x = k;
 				pos.y = i;
+				cout << k2 << " " << i2 << " " << k << " " << i <<  " " << v0_t << " " << v0 << "\n";
 				texturing(vector, pos, img, tex, col);
 				// img.set(k, i, col);
 			}
 		}
 	}
 
-	i2 = y1_t;
+	i2 = y1_t-1;
 
 	for(int i = y1; i<=y2; i++){
 		i2 = i2 + 1;
 		int s_height = y2-y1+1;
+		int s_height_t = y2_t-y1_t+1;
 		float a = (float)(i-y0)/height;
 		float a_t = (float)(i2-y0_t)/height_t;
 		float b = (float)(i-y1)/s_height;
+		float b_t = (float)(i2-y1_t)/s_height_t;
 		int A = x0 + (x2-x0)*a;
 		int B = x1 + (x2-x1)*b;
 		int A_t = x0_t + (x2_t-x0_t)*a_t;
+		int B_t = x1_t + (x2_t-x1_t)*a_t;
 		//std::cout << "1\n";
 		if (A > B) std::swap(A, B);
+		if (A_t > B_t) std::swap(A_t, B_t);
 		z = z0 + z1 + z2;
-		int k2 = A_t;
+		int k2 = A_t-1;
 		for (int k = A; k<=B; k++){
 			k2 = k2 + 1;
 			if(z > buffer[k+i*800]){
@@ -158,12 +170,16 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, vec3 v0_t, vec3 v1_t, vec3 v2_t, TGAIma
 	//line(x2, x0, y2, y0, img, white);
 }
 
+void flip_tex(TGAImage &tex){
+	tex.flip_vertically();
+}
+
 int main(int argc, char** argv) {
 	TGAImage image(800, 800, TGAImage::RGB);
 	TGAImage tex;
 	bool read = tex.read_tga_file("african_head_diffuse.tga");
-	// tex.flip_horizontally();
-	// tex.flip_vertically();
+	// flip_tex(tex);
+	cout << "red " << tex.get(748, 855).r%255 << "\n";
 	if (!read){
 		cout << "problem";
 		return -1;
@@ -260,6 +276,8 @@ int main(int argc, char** argv) {
 		vec3 v1_t = t_vertex[current_tex_triangle[1]-1];
 		vec3 v2_t = t_vertex[current_tex_triangle[2]-1];	
 
+		// cout << current_triangle[0] << " " << current_tex_triangle[0] << " " << vertex[current_triangle[0]-1] << " " << t_vertex[current_tex_triangle[0]-1]<< "\n";
+
 			w_coord[0] = v0_t;
 			w_coord[1] = v1_t;
 			w_coord[2] = v2_t;
@@ -272,11 +290,11 @@ int main(int argc, char** argv) {
 		float in = l*light_dir;
 		// cout << v0_t << " " << v1_t << "\n";	
 		//triangle(v0, v1, v2, image, TGAColor(rand()%255, rand()%255, rand()%255, 255), buffer);
-		// if(in > 0.){
-		// // triangle(v0, v1, v2, image, TGAColor((in*50*255), (50*in*255), (50*in*255), 255), buffer);
-		// 	// triangle(v0, v1, v2, v0_t, v1_t, v2_t, image, tex, TGAColor((in*50*255), (50*in*255), (50*in*255), 255), buffer);
-		// //	triangle(v0, v1, v2, image, white, buffer);
-		// }
+		if(in > 0.){
+		// triangle(v0, v1, v2, image, TGAColor((in*50*255), (50*in*255), (50*in*255), 255), buffer);
+			triangle(v0, v1, v2, v0_t, v1_t, v2_t, image, tex, TGAColor((in*50*255), (50*in*255), (50*in*255), 255), buffer);
+		//	triangle(v0, v1, v2, image, white, buffer);
+		}
 			
 		line((v0_t.x+1)*400, (v1_t.x+1)*400, (v0_t.y+1)*400, (v1_t.y+1)*400, image, white);
 		line((v1_t.x+1)*400, (v2_t.x+1)*400, (v1_t.y+1)*400, (v2_t.y+1)*400, image, white);
