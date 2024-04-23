@@ -70,12 +70,17 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, vec3 v0_t, vec3 v1_t, vec3 v2_t, TGAIma
 	int x2 = (v2.x+1) * 400;
 	int y2 = (v2.y+1) * 400;
 
-	int x0_t = (v0_t.x+1) * 512;
-	int y0_t = (v0_t.y+1) * 512;
-	int x1_t = (v1_t.x+1) * 512;
-	int y1_t = (v1_t.y+1) * 512;
-	int x2_t = (v2_t.x+1) * 512;
-	int y2_t = (v2_t.y+1) * 512;
+	int x0_t = (v0_t.x) * 1024;
+	int y0_t = (v0_t.y) * 1024;
+	int x1_t = (v1_t.x) * 1024;
+	int y1_t = (v1_t.y) * 1024;
+	int x2_t = (v2_t.x) * 1024;
+	int y2_t = (v2_t.y) * 1024;
+
+	// cout << x0_t << " " << x1_t << " " << x2_t << " " << y0_t << " " << y1_t <<  " " << y2_t << "\n";
+
+
+	// cout << x0_t << " " << y0_t << "\n";
 
 
 	int z0 = (v0.z+1) * 400;
@@ -89,7 +94,7 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, vec3 v0_t, vec3 v1_t, vec3 v2_t, TGAIma
 
 	float z = 0;
 
-	int i2 = y0_t-1;
+	int i2 = y0_t;
 
 	for(int i = y0; i<=y1; i++){
 		i2 = i2 + 1;
@@ -98,17 +103,22 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, vec3 v0_t, vec3 v1_t, vec3 v2_t, TGAIma
 		float a = (float)(i-y0)/height;
 		float a_t = (float)(i2-y0_t)/height_t;
 		float b = (float)(i-y0)/s_height;
-		float b_t = (float)(i2-y0_t)/s_height_t;
+		float b_t = (float)(i2-y0_t)/s_height;
 		int A = x0 + (x2-x0)*a;
 		int B = x0 + (x1-x0)*b;
 		int A_t = x0_t + (x2_t-x0_t)*a_t;
+		// cout  << A_t << "\n";
 		int B_t = x0_t + (x1_t-x0_t)*b_t;
-		// int B_t = x0_t + (x1_t-x0_t)*b;
+		if (B_t < 0){
+			cout << x0_t << " " << x1_t << " " << x2_t << " " << y0_t << " " << y1_t <<  " " << y2_t << "\n";
+			cout << x0_t << " " << y1_t << " " << y0_t << " " << s_height << " " << s_height_t << "\n";
+
+		}
 		//std::cout << "1\n";
 		if (A > B) std::swap(A, B);
 		if (A_t > B_t) std::swap(A_t, B_t);
 		z = z0 + z1 + z2;
-		int k2 = A_t-1;
+		int k2 = A_t;
 		for (int k = A; k<=B; k++){
 			k2 = k2 + 1;
 			if(z > buffer[k+i*800]){
@@ -121,14 +131,14 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, vec3 v0_t, vec3 v1_t, vec3 v2_t, TGAIma
 				vector.y = i2;
 				pos.x = k;
 				pos.y = i;
-				cout << k2 << " " << i2 << " " << k << " " << i <<  " " << v0_t << " " << v0 << "\n";
+				// cout << i2 << " " << y0_t << " " << a_t << " " << A_t << " " << k2 << " " << i2 << " " << k << " " << i <<  " " << v0_t << " " << v0 << "\n";
 				texturing(vector, pos, img, tex, col);
 				// img.set(k, i, col);
 			}
 		}
 	}
 
-	i2 = y1_t-1;
+	i2 = y1_t;
 
 	for(int i = y1; i<=y2; i++){
 		i2 = i2 + 1;
@@ -137,16 +147,16 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, vec3 v0_t, vec3 v1_t, vec3 v2_t, TGAIma
 		float a = (float)(i-y0)/height;
 		float a_t = (float)(i2-y0_t)/height_t;
 		float b = (float)(i-y1)/s_height;
-		float b_t = (float)(i2-y1_t)/s_height_t;
+		float b_t = (float)(i2-y1_t)/s_height;
 		int A = x0 + (x2-x0)*a;
 		int B = x1 + (x2-x1)*b;
 		int A_t = x0_t + (x2_t-x0_t)*a_t;
-		int B_t = x1_t + (x2_t-x1_t)*a_t;
+		int B_t = x1_t + (x2_t-x1_t)*b_t;
 		//std::cout << "1\n";
 		if (A > B) std::swap(A, B);
 		if (A_t > B_t) std::swap(A_t, B_t);
 		z = z0 + z1 + z2;
-		int k2 = A_t-1;
+		int k2 = A_t;
 		for (int k = A; k<=B; k++){
 			k2 = k2 + 1;
 			if(z > buffer[k+i*800]){
@@ -176,9 +186,10 @@ void flip_tex(TGAImage &tex){
 
 int main(int argc, char** argv) {
 	TGAImage image(800, 800, TGAImage::RGB);
-	TGAImage tex;
+	TGAImage tex(1024, 1024, TGAImage::RGB);
 	bool read = tex.read_tga_file("african_head_diffuse.tga");
-	// flip_tex(tex);
+	flip_tex(tex);
+	// tex.write_tga_file("tex.tga");
 	cout << "red " << tex.get(748, 855).r%255 << "\n";
 	if (!read){
 		cout << "problem";
@@ -274,7 +285,7 @@ int main(int argc, char** argv) {
 			// Texturing pass should be done afterwards, not one to one on tex coords 
 		vec3 v0_t = t_vertex[current_tex_triangle[0]-1];
 		vec3 v1_t = t_vertex[current_tex_triangle[1]-1];
-		vec3 v2_t = t_vertex[current_tex_triangle[2]-1];	
+		vec3 v2_t = t_vertex[current_tex_triangle[2]-1];
 
 		// cout << current_triangle[0] << " " << current_tex_triangle[0] << " " << vertex[current_triangle[0]-1] << " " << t_vertex[current_tex_triangle[0]-1]<< "\n";
 
@@ -296,12 +307,39 @@ int main(int argc, char** argv) {
 		//	triangle(v0, v1, v2, image, white, buffer);
 		}
 			
-		line((v0_t.x+1)*400, (v1_t.x+1)*400, (v0_t.y+1)*400, (v1_t.y+1)*400, image, white);
-		line((v1_t.x+1)*400, (v2_t.x+1)*400, (v1_t.y+1)*400, (v2_t.y+1)*400, image, white);
-		line((v2_t.x+1)*400, (v0_t.x+1)*400, (v2_t.y+1)*400, (v0_t.y+1)*400, image, white);
+		// line((v0_t.x+1)*400, (v1_t.x+1)*400, (v0_t.y+1)*400, (v1_t.y+1)*400, image, white);
+		// line((v1_t.x+1)*400, (v2_t.x+1)*400, (v1_t.y+1)*400, (v2_t.y+1)*400, image, white);
+		// line((v2_t.x+1)*400, (v0_t.x+1)*400, (v2_t.y+1)*400, (v0_t.y+1)*400, image, white);
 		
 
 	}
+
+	// for(int i = 0; i<(int)f_vertex.size(); i++){
+	// 	vec3 w_coord[3];
+	// 	vec3 s_coord[3];
+	// 	vector<int> current_triangle = f_vertex[i];
+	// 	vector<int> current_tex_triangle = tex_vertex[i];
+	// 		vec3 v0 = vertex[current_triangle[0]-1];
+	// 		vec3 v1 = vertex[current_triangle[1]-1];
+	// 		vec3 v2 = vertex[current_triangle[2]-1];
+	
+	// 	vec3 l = cross((w_coord[2]-w_coord[1]), (w_coord[1]-w_coord[0])); 
+	// 	l.normalized();
+	// 	float in = l*light_dir;
+	// 	// cout << v0_t << " " << v1_t << "\n";	
+	// 	//triangle(v0, v1, v2, image, TGAColor(rand()%255, rand()%255, rand()%255, 255), buffer);
+	// 	// if(in > 0.){
+	// 	// // triangle(v0, v1, v2, image, TGAColor((in*50*255), (50*in*255), (50*in*255), 255), buffer);
+	// 	// 	triangle(v0, v1, v2, v0_t, v1_t, v2_t, image, tex, TGAColor((in*50*255), (50*in*255), (50*in*255), 255), buffer);
+	// 	// //	triangle(v0, v1, v2, image, white, buffer);
+	// 	// }
+			
+	// 	line((v0.x+1)*400, (v1.x+1)*400, (v0.y+1)*400, (v1.y+1)*400, image, white);
+	// 	line((v1.x+1)*400, (v2.x+1)*400, (v1.y+1)*400, (v2.y+1)*400, image, white);
+	// 	line((v2.x+1)*400, (v0.x+1)*400, (v2.y+1)*400, (v0.y+1)*400, image, white);
+		
+
+	// }
 
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
 	image.write_tga_file("output.tga");
