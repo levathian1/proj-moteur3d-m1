@@ -9,6 +9,8 @@
 
 using namespace std;
 
+const float camera_dist = 0.5f;
+
 
 const TGAColor white = TGAColor(255, 255, 255, 255);
 const TGAColor red   = TGAColor(255, 0,   0,   255);
@@ -127,11 +129,12 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, vec3 v0_t, vec3 v1_t, vec3 v2_t, TGAIma
 			//	std::cout << a << " " << b << "\n";
 				buffer[k+i*800] = z;
 				vec3 vector, pos;
-				vector.x = k2;
+				vector.x = k2 ;
 				vector.y = i2;
 				pos.x = k;
 				pos.y = i;
-				// cout << i2 << " " << y0_t << " " << a_t << " " << A_t << " " << k2 << " " << i2 << " " << k << " " << i <<  " " << v0_t << " " << v0 << "\n";
+
+				// cout <<  pos.x << " " << pos.y << "\n";
 				texturing(vector, pos, img, tex, col);
 				// img.set(k, i, col);
 			}
@@ -164,7 +167,7 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, vec3 v0_t, vec3 v1_t, vec3 v2_t, TGAIma
 				buffer[k+i*800] = z;
 				vec3 vector, pos;
 				vector.x = k2;
-				vector.y = i2;
+				vector.y = i2; 
 				pos.x = k;
 				pos.y = i;
 				texturing(vector, pos, img, tex, col);
@@ -185,6 +188,10 @@ void flip_tex(TGAImage &tex){
 }
 
 int main(int argc, char** argv) {
+
+	float c_dist = 1.0f;
+
+
 	TGAImage image(800, 800, TGAImage::RGB);
 	TGAImage tex(1024, 1024, TGAImage::RGB);
 	bool read = tex.read_tga_file("african_head_diffuse.tga");
@@ -274,6 +281,8 @@ int main(int argc, char** argv) {
 		file.close();
 	}else cout << "couldn't open file\n";
 
+	int g = 1;
+
 	for(int i = 0; i<(int)f_vertex.size(); i++){
 		vec3 w_coord[3];
 		vec3 s_coord[3];
@@ -286,6 +295,22 @@ int main(int argc, char** argv) {
 		vec3 v0_t = t_vertex[current_tex_triangle[0]-1];
 		vec3 v1_t = t_vertex[current_tex_triangle[1]-1];
 		vec3 v2_t = t_vertex[current_tex_triangle[2]-1];
+
+		cout << v0.x << "\n";
+
+		v0.x = v0.x / (1 - (g/camera_dist));
+		v1.x = v1.x / (1 - (g/camera_dist));
+		v2.x = v2.x / (1 - (g/camera_dist));
+
+		v0.y = v0.y / (1 - (g/camera_dist));
+		v1.y = v1.y / (1 - (g/camera_dist));
+		v2.y = v2.y / (1 - (g/camera_dist));
+
+		v0.z = v0.z / (1 - (g/camera_dist));
+		v1.z = v1.z / (1 - (g/camera_dist));
+		v2.z = v2.z / (1 - (g/camera_dist));
+
+		cout << v0 << "\n";
 
 		// cout << current_triangle[0] << " " << current_tex_triangle[0] << " " << vertex[current_triangle[0]-1] << " " << t_vertex[current_tex_triangle[0]-1]<< "\n";
 
