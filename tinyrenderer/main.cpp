@@ -298,17 +298,18 @@ int main(int argc, char** argv) {
 
 		cout << v0.x << "\n";
 
-		v0.x = v0.x / (1 - (g/camera_dist));
-		v1.x = v1.x / (1 - (g/camera_dist));
-		v2.x = v2.x / (1 - (g/camera_dist));
+		v0.z = v0.z / (1 - (v0.z/camera_dist));
+		v1.z = v1.z / (1 - (v1.z/camera_dist));
+		v2.z = v2.z / (1 - (v2.z/camera_dist));
 
-		v0.y = v0.y / (1 - (g/camera_dist));
-		v1.y = v1.y / (1 - (g/camera_dist));
-		v2.y = v2.y / (1 - (g/camera_dist));
+		v0.x = v0.x / (1 - (v0.z/camera_dist));
+		v1.x = v1.x / (1 - (v1.z/camera_dist));
+		v2.x = v2.x / (1 - (v2.z/camera_dist));
 
-		v0.z = v0.z / (1 - (g/camera_dist));
-		v1.z = v1.z / (1 - (g/camera_dist));
-		v2.z = v2.z / (1 - (g/camera_dist));
+		v0.y = v0.y / (1 - (v0.z/camera_dist));
+		v1.y = v1.y / (1 - (v1.z/camera_dist));
+		v2.y = v2.y / (1 - (v2.z/camera_dist));
+
 
 		cout << v0 << "\n";
 
