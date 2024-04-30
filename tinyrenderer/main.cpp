@@ -9,7 +9,7 @@
 
 using namespace std;
 
-const float camera_dist = 0.5f;
+const int camera_dist = 2;
 
 
 const TGAColor white = TGAColor(255, 255, 255, 255);
@@ -139,6 +139,7 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, vec3 v0_t, vec3 v1_t, vec3 v2_t, TGAIma
 				// img.set(k, i, col);
 			}
 		}
+		cout << "first: " << i << " " << y1 << "\n";
 	}
 
 	i2 = y1_t;
@@ -174,6 +175,7 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, vec3 v0_t, vec3 v1_t, vec3 v2_t, TGAIma
 				// img.set(k, i, col);
 			}
 		}
+		cout << "second: " << i << " " << y2 << "\n";
 	}
 
 	// cout << "hi2" << "\n";
@@ -297,7 +299,7 @@ int main(int argc, char** argv) {
 		vec3 v2_t = t_vertex[current_tex_triangle[2]-1];
 
 		cout << v0.x << "\n";
-
+		cout << v0.z/camera_dist <<  " " << v1.z/camera_dist << " " << v2.z/camera_dist << "\n"; 
 		v0.z = v0.z / (1 - (v0.z/camera_dist));
 		v1.z = v1.z / (1 - (v1.z/camera_dist));
 		v2.z = v2.z / (1 - (v2.z/camera_dist));
@@ -306,12 +308,11 @@ int main(int argc, char** argv) {
 		v1.x = v1.x / (1 - (v1.z/camera_dist));
 		v2.x = v2.x / (1 - (v2.z/camera_dist));
 
-		v0.y = v0.y / (1 - (v0.z/camera_dist));
-		v1.y = v1.y / (1 - (v1.z/camera_dist));
-		v2.y = v2.y / (1 - (v2.z/camera_dist));
+		// v0.y = v0.y / (1 - (v0.z/camera_dist));
+		// v1.y = v1.y / (1 - (v1.z/camera_dist));
+		// v2.y = v2.y / (1 - (v2.z/camera_dist));
 
 
-		cout << v0 << "\n";
 
 		// cout << current_triangle[0] << " " << current_tex_triangle[0] << " " << vertex[current_triangle[0]-1] << " " << t_vertex[current_tex_triangle[0]-1]<< "\n";
 
@@ -368,6 +369,7 @@ int main(int argc, char** argv) {
 	// }
 
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
+
 	image.write_tga_file("output.tga");
 	return 0;
 }
