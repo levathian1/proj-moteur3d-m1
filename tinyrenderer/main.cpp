@@ -111,11 +111,11 @@ void triangle(vec3 v0, vec3 v1, vec3 v2, vec3 v0_t, vec3 v1_t, vec3 v2_t, TGAIma
 		int A_t = x0_t + (x2_t-x0_t)*a_t;
 		// cout  << A_t << "\n";
 		int B_t = x0_t + (x1_t-x0_t)*b_t;
-		if (B_t < 0){
-			cout << x0_t << " " << x1_t << " " << x2_t << " " << y0_t << " " << y1_t <<  " " << y2_t << "\n";
-			cout << x0_t << " " << y1_t << " " << y0_t << " " << s_height << " " << s_height_t << "\n";
+		// if (B_t < 0){
+		// 	cout << x0_t << " " << x1_t << " " << x2_t << " " << y0_t << " " << y1_t <<  " " << y2_t << "\n";
+		// 	cout << x0_t << " " << y1_t << " " << y0_t << " " << s_height << " " << s_height_t << "\n";
 
-		}
+		// }
 		//std::cout << "1\n";
 		if (A > B) std::swap(A, B);
 		if (A_t > B_t) std::swap(A_t, B_t);
@@ -229,10 +229,14 @@ int main(int argc, char** argv) {
 	vec3 light_dir;
 	light_dir.x = 0; light_dir.y = 0; light_dir.z = -1;
 	
+
+	// read the file
 	if (file.is_open()){
 		cout << "opened file\n";
 		while(!file.eof()){
 			getline(file, line_s);
+			// https://stackoverflow.com/questions/2323929/istringstream-how-to-do-this
+			// https://stackoverflow.com/questions/49441046/c-how-does-istringsteam-work
 			std::istringstream iss(line_s.c_str()); 
 			//cout << "test\n";
 			//cout << a;
@@ -300,6 +304,8 @@ int main(int argc, char** argv) {
 
 		cout << v0.x << "\n";
 		cout << v0.z/camera_dist <<  " " << v1.z/camera_dist << " " << v2.z/camera_dist << "\n"; 
+
+		// Perspective on z + x
 		v0.z = v0.z / (1 - (v0.z/camera_dist));
 		v1.z = v1.z / (1 - (v1.z/camera_dist));
 		v2.z = v2.z / (1 - (v2.z/camera_dist));
@@ -307,6 +313,8 @@ int main(int argc, char** argv) {
 		v0.x = v0.x / (1 - (v0.z/camera_dist));
 		v1.x = v1.x / (1 - (v1.z/camera_dist));
 		v2.x = v2.x / (1 - (v2.z/camera_dist));
+
+		// causes memory realloc problems :)
 
 		// v0.y = v0.y / (1 - (v0.z/camera_dist));
 		// v1.y = v1.y / (1 - (v1.z/camera_dist));
@@ -316,6 +324,7 @@ int main(int argc, char** argv) {
 
 		// cout << current_triangle[0] << " " << current_tex_triangle[0] << " " << vertex[current_triangle[0]-1] << " " << t_vertex[current_tex_triangle[0]-1]<< "\n";
 
+		// world coords for light calc
 			w_coord[0] = v0_t;
 			w_coord[1] = v1_t;
 			w_coord[2] = v2_t;
